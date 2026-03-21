@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mystical Garden — About Us</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --pink: #e8557a; --pink-light: #fce8ee; --pink-mid: #f5c6d4;
+      --cream: #fdf6f0; --text: #2d1f1f; --muted: #9a7070;
+      --dark: #1e1212;  
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); overflow-x: hidden; }
+
+    /* ══ NAV ══ */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; padding: 18px 60px; background: rgba(253,246,240,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(232,85,122,0.1); }
+    .logo { font-family: 'Playfair Display', serif; font-size: 22px; font-style: italic; color: var(--pink); letter-spacing: 0.02em; text-decoration: none; }
+    .nav-links { display: flex; flex-direction: row; gap: 32px; list-style: none; align-items: center; }
+    .nav-links a { text-decoration: none; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); font-weight: 500; transition: color 0.2s; white-space: nowrap; }
+    .nav-links a:hover, .nav-links a.active { color: var(--pink); }
+    .nav-dropdown { position: relative; }
+    .nav-dropdown > a { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+    .nav-dropdown > a::after { content: '▾'; font-size: 11px; transition: transform 0.2s; }
+    .nav-dropdown:hover > a::after { transform: rotate(180deg); }
+    .dropdown-menu { position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(-8px); background: #fff; border-radius: 12px; box-shadow: 0 8px 30px rgba(45,31,31,0.12); border: 1px solid var(--pink-mid); padding: 8px; min-width: 200px; opacity: 0; visibility: hidden; transition: all 0.25s ease; z-index: 300; }
+    .dropdown-menu::before { display: none; }
+    .nav-dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    .dropdown-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: var(--text); font-size: 13px; font-weight: 500; transition: background 0.2s, color 0.2s; white-space: nowrap; letter-spacing: 0; text-transform: none; }
+    .dropdown-item:hover { background: var(--pink-light); color: var(--pink); }
+    .nav-actions { display: flex; align-items: center; gap: 16px; }
+    .nav-cart, .nav-signin { text-decoration: none; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); font-weight: 500; transition: color 0.2s; }
+    .nav-cart:hover, .nav-signin:hover { color: var(--pink); }
+    .nav-cta { background: var(--pink); color: white !important; padding: 10px 22px; border-radius: 999px; font-size: 12px !important; text-decoration: none; transition: background 0.2s; }
+    .nav-cta:hover { background: #d44068; }
+
+    /* ══ HERO ══ */
+    .about-hero {
+      min-height: 50vh; padding: 140px 60px 80px;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center;
+      background: linear-gradient(135deg, var(--pink) 0%, var(--cream) 90%);
+      position: relative; overflow: hidden;
+    }
+    .about-hero .sec-tag { display: inline-block; font-size: 20px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--pink); }
+    .about-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(40px, 6vw, 70px); color: var(--text); line-height: 1.1; margin-bottom: 16px; }
+    .about-hero h1 em { color: var(--pink); font-style: italic; }
+    .about-hero p { color: var(--muted); font-size: 16px; max-width: 520px; line-height: 1.8; }
+
+    /* ══ STORY SECTION ══ */
+    .story-section {
+      padding: 80px 60px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      background: #fff;
+    }
+    .story-img {
+      border-radius: 24px;
+      overflow: hidden;
+      height: 460px;
+      position: relative;
+    }
+    .story-img img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+    .story-img-accent {
+      position: absolute; bottom: -20px; right: -20px;
+      width: 160px; height: 160px;
+      background: var(--pink-light);
+      border-radius: 50%;
+      z-index: -1;
+    }
+    .story-text .sec-tag { display: inline-block; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--pink); margin-bottom: 14px; }
+    .story-text h2 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 3.5vw, 42px); color: var(--text); margin-bottom: 20px; line-height: 1.2; }
+    .story-text h2 em { color: var(--pink); font-style: italic; }
+    .story-text p { color: var(--muted); font-size: 15px; line-height: 1.9; margin-bottom: 16px; }
+
+    /* ══ VISION MISSION ══ */
+    .vm-section { padding: 80px 60px; background: var(--dark); position: relative; overflow: hidden; }
+    .vm-section::before { content: ''; position: absolute; width: 500px; height: 500px; background: radial-gradient(circle, rgba(232,85,122,0.15) 0%, transparent 70%); top: -100px; right: -100px; border-radius: 50%; }
+    .vm-header { text-align: center; margin-bottom: 60px; }
+    .vm-header .sec-tag { display: inline-block; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--pink-mid); margin-bottom: 14px; }
+    .vm-header h2 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 44px); color: white; }
+    .vm-header h2 em { color: var(--pink); font-style: italic; }
+
+    .vm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; max-width: 900px; margin: 0 auto; }
+    .vm-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(232,85,122,0.2);
+      border-radius: 20px;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .vm-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(232,85,122,0.15); }
+    .vm-card h3 { font-family: 'Playfair Display', serif; font-size: 22px; color: white; margin-bottom: 14px; }
+    .vm-card h3 em { color: var(--pink); font-style: italic; }
+    .vm-card p { color: rgba(255,255,255,0.65); font-size: 14px; line-height: 1.9; }
+
+    /* ══ VALUES ══ */
+    .values-section { padding: 80px 60px; background: var(--pink-light); }
+    .values-header { text-align: center; margin-bottom: 48px; }
+    .values-header .sec-tag { display: inline-block; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--pink); margin-bottom: 12px; }
+    .values-header h2 { font-family: 'Playfair Display', serif; font-size: clamp(26px, 3.5vw, 40px); color: var(--text); }
+    .values-header h2 em { color: var(--pink); font-style: italic; }
+    .values-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1000px; margin: 0 auto; }
+    .value-card { background: white; border-radius: 16px; padding: 28px 24px; text-align: center; border: 1px solid var(--pink-mid); transition: transform 0.3s, box-shadow 0.3s; }
+    .value-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(232,85,122,0.12); }
+    .value-card h4 { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--text); margin-bottom: 8px; }
+    .value-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+    /* ══ TEAM ══ */
+    .team-section { padding: 80px 60px; background: #fff; }
+    .team-header { text-align: center; margin-bottom: 56px; }
+    .team-header .sec-tag { display: inline-block; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--pink); margin-bottom: 12px; }
+    .team-header h2 { font-family: 'Playfair Display', serif; font-size: clamp(26px, 3.5vw, 40px); color: var(--text); }
+    .team-header h2 em { color: var(--pink); font-style: italic; }
+    .team-header p { color: var(--muted); font-size: 14px; margin-top: 10px; }
+
+    /* CEO - featured */
+    .ceo-card {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 48px;
+      align-items: center;
+      background: linear-gradient(135deg, var(--pink-light), var(--cream));
+      border-radius: 24px;
+      padding: 48px;
+      margin-bottom: 48px;
+      border: 1px solid var(--pink-mid);
+    }
+    .ceo-img { width: 280px; height: 320px; border-radius: 20px; overflow: hidden; background: var(--pink-mid); }
+    .ceo-img img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+    .ceo-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 80px; background: linear-gradient(160deg, var(--pink-light), var(--pink-mid)); }
+    .ceo-badge { display: inline-block; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--pink); border: 1px solid var(--pink-mid); padding: 5px 14px; border-radius: 999px; background: white; margin-bottom: 14px; }
+    .ceo-info h3 { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--text); margin-bottom: 4px; }
+    .ceo-info .ceo-title { font-size: 14px; color: var(--pink); font-weight: 600; margin-bottom: 16px; letter-spacing: 0.05em; }
+    .ceo-info p { color: var(--muted); font-size: 14px; line-height: 1.9; max-width: 500px; }
+    .ceo-quote p { font-family: 'Playfair Display', serif; font-style: italic; font-size: 15px; color: var(--text); }
+
+    /* Florists grid */
+    .florists-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+    .florist-card { background: var(--cream); border-radius: 20px; overflow: hidden; border: 1px solid var(--pink-mid); transition: transform 0.3s, box-shadow 0.3s; text-align: center; }
+    .florist-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(232,85,122,0.15); }
+    .florist-img { height: 240px; overflow: hidden; background: var(--pink-light); }
+    .florist-img img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; transition: transform 0.4s; }
+    .florist-card:hover .florist-img img { transform: scale(1.05); }
+    .florist-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 60px; }
+    .florist-info { padding: 20px 16px 24px; }
+    .florist-info h4 { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--text); margin-bottom: 4px; }
+    .florist-info .florist-role { font-size: 12px; color: var(--pink); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+    .florist-info p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+    /* ══ FOOTER ══ */
+    footer { background: var(--dark); color: rgba(255,255,255,0.6); padding: 60px 60px 30px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+    .footer-brand .logo { display: block; margin-bottom: 14px; color: var(--pink-mid); font-size: 24px; }
+    .footer-brand p { font-size: 13px; line-height: 1.7; max-width: 240px; }
+    .footer-col h4 { font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: white; margin-bottom: 16px; }
+    .footer-col a { display: block; font-size: 13px; color: rgba(255,255,255,0.5); text-decoration: none; margin-bottom: 10px; transition: color 0.2s; }
+    .footer-col a:hover { color: var(--pink); }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+    .footer-socials { display: flex; gap: 14px; }
+    .footer-socials a { width: 34px; height: 34px; background: rgba(255,255,255,0.07); border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; transition: background 0.2s; }
+    .footer-socials a:hover { background: var(--pink); }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">Mystical Garden</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li class="nav-dropdown">
+        <a href="#">Occasions</a>
+        <div class="dropdown-menu">
+          <a href="occasions/wedding.html"    class="dropdown-item"> Wedding Venue</a>
+          <a href="occasions/proposal.html"   class="dropdown-item"> Proposal Setup</a>
+          <a href="occasions/birthday.html"   class="dropdown-item"> Birthday</a>
+          <a href="occasions/graduation.html" class="dropdown-item"> Graduation</a>
+        </div>
+      </li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="nav-cart">Add to Cart</a>
+      <a href="Signin.html" class="nav-signin" id="navSignin">Sign In</a>
+      <a href="shop.html" class="nav-cta">Order Now</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="about-hero">
+    <div class="sec-tag">Our Story</div>
+    <br>
+    <h1>We Bloom With <em>Purpose</em></h1>
+    <p>Behind every petal is a story of passion, creativity, and love. Mystical Garden was born from a dream — to make every moment more beautiful, one bloom at a time.</p>
+  </div>
+
+  <!-- STORY -->
+  <section class="story-section">
+    <div class="story-img">
+      <img src="Images/nav.jpg" alt="Our Story"/>
+      <div class="story-img-accent"></div>
+    </div>
+    <div class="story-text">
+      <div class="sec-tag">How It All Started</div>
+      <h2>A Garden Born From <em>Love</em></h2>
+      <p>Mystical Garden started as a small home-based flower shop with one simple belief — that flowers have the power to make people feel truly seen and celebrated. What began as a passion project soon blossomed into a full-service floral studio serving hundreds of clients across the Philippines.</p>
+      <p>From intimate birthdays to grand wedding venues, we pour our hearts into every arrangement. Each bouquet is handcrafted with care, using only the freshest blooms and the most creative designs tailored to your story.</p>
+      <p>Today, Mystical Garden is more than a flower shop — it's a sanctuary of creativity, warmth, and floral artistry. We believe that every occasion, big or small, deserves to be adorned with beauty.</p>
+    </div>
+  </section>
+
+  <!-- VISION & MISSION -->
+  <section class="vm-section">
+    <div class="vm-header">
+      <div class="sec-tag">What Drives Us</div>
+      <h2>Vision & <em>Mission</em></h2>
+    </div>
+    <div class="vm-grid">
+      <div class="vm-card">
+        <h3>Our <em>Vision</em></h3>
+        <p>To be the most cherished floral studio in the Philippines, renowned for using the eternal beauty of flowers to turn everyday moments into remarkable memories. In our ideal world, the ideal flower would be used to commemorate every milestone, celebration, and feeling.</p>
+      </div>
+      <div class="vm-card">
+        <h3>Our <em>Mission</em></h3>
+        <p>To create outstanding floral arrangements with passion, imagination, and commitment providing more than just flowers, but emotions. We are dedicated to offering same-day delivery, individualized service, and designs that resonate deeply with the individuals we serve and the spirit of every occasion.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUES -->
+  <section class="values-section">
+    <div class="values-header">
+      <div class="sec-tag">What We Stand For</div>
+      <h2>Our Core <em>Values</em></h2>
+    </div>
+    <div class="values-grid">
+      <div class="value-card">
+
+        <h4>Made With Love and Joy </h4>
+        <p>Every arrangement that our florist handcrafted with genuine care and passion for floral artistry love.</p>
+      </div>
+      <div class="value-card">
+        <h4>Creativity</h4>
+        <p>We push the boundaries of floral design with a fresh, always stunning, always unique designs for each clients.</p>
+      </div>
+      <div class="value-card">
+        <h4>Quality Flowers</h4>
+        <p>We source only the freshest flowers to ensure every bouquet looks and lasts beautifully when it came from delivery.</p>
+      </div>
+      <div class="value-card">
+        <h4>Personal Service</h4>
+        <p>We listen to your story and create arrangements that truly reflect your vision and heart.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section class="team-section">
+    <div class="team-header">
+      <div class="sec-tag">✦ The Faces Behind The Blooms</div>
+      <h2>Meet Our <em>Team</em></h2>
+      <p>Passionate florists dedicated to making your moments unforgettable.</p>
+    </div>
+
+    <!-- CEO -->
+    <div class="ceo-card">
+      <div class="ceo-img">
+        <img src="Images/ceo.jpg" alt="CEO"/>
+      </div>
+      <div class="ceo-info">
+        <div class="ceo-badge">✦ Founder & CEO</div>
+        <h3>Aurora Theria</h3>
+        <div class="ceo-title">Chief Executive Officer — Mystical Garden</div>
+        <p>Aurora founded Mystical Garden with a single dream: to share the magic of flowers with the world. With over 10 years of experience in floral design and event styling, she has transformed hundreds of weddings, celebrations, and intimate moments into breathtaking floral masterpieces. Her eye for beauty and passion for storytelling through blooms is the heart of everything Mystical Garden stands for.</p>
+        <br>
+        <div class="ceo-quote">
+          <p>"Every petals of the flowers that you choose has a story"</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLORISTS -->
+    <div class="florists-grid">
+      <div class="florist-card">
+        <div class="florist-img">
+          <img src="Images\Aest.jpg" alt="Aest"/> 
+        </div>
+        <div class="florist-info">
+          <h4>Aestherielle</h4>
+          <div class="florist-role">Senior Florist</div>
+          <p>Specializes in wedding arrangements and beautiful bouquets. renowned for her sophisticated and romantic floral designs.</p>
+        </div>
+      </div>
+      <div class="florist-card">
+        <div class="florist-img">
+        <img src="Images\Alex.jpg" alt="Alex"/> 
+        </div>
+        <div class="florist-info">
+          <h4>Alectrona</h4>
+          <div class="florist-role">Crochet Specialist</div>
+          <p>Our in-house crochet flower artist creates beautiful, long-lasting handmade flowers.</p>
+        </div>
+      </div>
+      <div class="florist-card">
+        <div class="florist-img">
+         <img src="Images\love.jpg" alt="Love"/> 
+        </div>
+        <div class="florist-info">
+          <h4>Love Lhea</h4>
+          <div class="florist-role">Event Florist</div>
+          <p>Skilled at creating elaborate flower arrangements for corporate occasions, weddings, and grand openings</p>
+        </div>
+      </div>
+      <div class="florist-card">
+        <div class="florist-img">
+          <img src="Images\Au.jpg" alt="Au"/> 
+        </div>
+        <div class="florist-info">
+          <h4>Aea</h4>
+          <div class="florist-role">Gift Set Designer</div>
+          <p>Combines flowers with thoughtful surprises to create lovely gift boxes and personalized bouquets.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="logo">Mystical Garden</span>
+        <p>Crafting beautiful floral arrangements for every moment, milestone, and memory. Fresh blooms, same-day delivery.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Core Features</h4>
+        <a href="#">Same Day Delivery</a>
+        <a href="#">Custom Bouquets</a>
+        <a href="#">Event Florals</a>
+        <a href="#">Gift Packages</a>
+      </div>
+      <div class="footer-col">
+        <h4>Learn More</h4>
+        <a href="#">Blog</a>
+        <a href="#">Case Studies</a>
+        <a href="#">Customer Stories</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="#">Contact</a>
+        <a href="#">Support</a>
+        <a href="#">Legal</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Mystical Garden All rights reserved.</span>
+      <div class="footer-socials">
+       <a href="https://www.instagram.com/won_jww" target="_blank">📸</a>
+      <a href="https://www.twitter.com/aea29858" target="_blank">🐦</a>
+     <a href="https://mail.google.com/mail/?view=cm&to=aea29858@gmail.com" target="_blank">💼</a>
+      </div>
+    </div>
+  </footer>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+  const user = JSON.parse(localStorage.getItem('mg_user'));
+  const signinBtn = document.getElementById('navSignin');
+  if (user && signinBtn) {
+    signinBtn.innerHTML = `Hi, ${user.name.split(' ')[0]}! &nbsp;|&nbsp; <span onclick="logOut()" style="cursor:pointer;color:var(--pink)">Logout</span>`;
+    signinBtn.href = '#';
+  }
+});
+
+function logOut() {
+  localStorage.removeItem("mg_user");
+  localStorage.removeItem("mg_cart"); // CLEAR CART
+  window.location.href = "index.html";
+}
+
+</script>
+</body>
+</html>

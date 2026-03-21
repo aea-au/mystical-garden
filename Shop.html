@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mystical Garden — Shop</title>
+  <style>
+    :root {
+      --pink: #e8557a;
+      --pink-light: #fce8ee;
+      --pink-mid: #f5c6d4;
+      --red: #c0392b;
+      --cream: #fdf6f0;
+      --text: #2d1f1f;
+      --muted: #9a7070;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+    }
+   
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 60px;
+    background: rgba(253,246,240,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(232,85,122,0.1);
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-style: italic;
+    color: var(--pink);
+    letter-spacing: 0.02em;
+  }
+  .nav-links { display: flex; gap: 32px; list-style: none; align-items: center; }
+  .nav-links a {
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text);
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--pink); }
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.nav-cart, .nav-signin {
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text);
+    font-weight: 500;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    position: relative;
+}
+
+.nav-cart:hover, .nav-signin:hover { 
+    color: var(--pink); 
+}
+
+/* ── Cart Badge ── */
+.cart-badge {
+  display: none;
+  position: absolute;
+  top: -8px;
+  right: -12px;
+  background: var(--pink);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+}
+.cart-badge.show { display: flex; }
+
+.nav-cta {
+    background: var(--pink);
+    color: white !important;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: 12px !important;
+    text-decoration: none;
+}
+.nav-cta:hover { background: #d44068; color: white !important; }
+
+/* ── Occasions Dropdown ── */
+  .nav-dropdown { position: relative; }
+
+  .nav-dropdown > a {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+
+  .nav-dropdown > a::after {
+    content: '▾';
+    font-size: 11px;
+    transition: transform 0.2s;
+  }
+
+  .nav-dropdown:hover > a::after {
+    transform: rotate(180deg);
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(45,31,31,0.12);
+    border: 1px solid var(--pink-mid);
+    padding: 8px;
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s ease;
+    z-index: 300;
+  }
+
+  .dropdown-menu::before { display: none; }
+
+  .nav-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .dropdown-item:hover {
+    background: var(--pink-light);
+    color: var(--pink);
+  }
+
+  /* ══ CART SIDEBAR ══ */
+  .cart-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 400;
+    opacity: 0; visibility: hidden;
+    transition: all 0.3s;
+  }
+  .cart-overlay.open { opacity: 1; visibility: visible; }
+
+  .cart-sidebar {
+    position: fixed;
+    top: 0; right: 0;
+    width: 380px; height: 100vh;
+    background: #fff;
+    z-index: 500;
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: -8px 0 40px rgba(45,31,31,0.15);
+  }
+  .cart-sidebar.open { transform: translateX(0); }
+
+  .cart-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--pink-mid);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cart-header h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--text); }
+  .cart-header h3 em { color: var(--pink); font-style: italic; }
+  .cart-close {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: none; background: var(--pink-light); color: var(--pink);
+    font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .cart-close:hover { background: var(--pink); color: white; }
+
+  .cart-items { flex: 1; overflow-y: auto; padding: 16px 24px; }
+
+  .cart-empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .cart-empty p { font-size: 14px; margin-top: 8px; }
+
+  .cart-item {
+    display: flex; gap: 14px; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid var(--pink-light);
+  }
+  .cart-item-img {
+    width: 60px; height: 60px; border-radius: 10px;
+    object-fit: cover; background: var(--pink-light); flex-shrink: 0;
+  }
+  .cart-item-info { flex: 1; }
+  .cart-item-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .cart-item-price { font-size: 13px; font-weight: 700; color: var(--pink); }
+  .cart-item-qty { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .qty-btn {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 1.5px solid var(--pink-mid); background: transparent;
+    color: var(--text); font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; font-family: inherit;
+  }
+  .qty-btn:hover { background: var(--pink); border-color: var(--pink); color: white; }
+  .qty-num { font-size: 13px; font-weight: 600; min-width: 16px; text-align: center; }
+  .cart-item-remove {
+    background: none; border: none; color: var(--muted);
+    font-size: 16px; cursor: pointer; padding: 4px; transition: color 0.2s;
+  }
+  .cart-item-remove:hover { color: var(--pink); }
+
+  .cart-footer { padding: 16px 24px 24px; border-top: 1px solid var(--pink-mid); }
+  .cart-total { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .cart-total span:first-child { font-size: 14px; color: var(--muted); font-weight: 500; }
+  .cart-total-price { font-size: 20px; font-weight: 700; color: var(--pink); }
+  .btn-checkout {
+    width: 100%; padding: 14px;
+    background: var(--pink); color: white;
+    border: none; border-radius: 999px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: inherit; transition: all 0.25s;
+    box-shadow: 0 6px 20px rgba(232,85,122,0.3);
+  }
+  .btn-checkout:hover { background: #d44068; transform: translateY(-2px); }
+  .btn-clear {
+    width: 100%; padding: 10px; background: transparent;
+    color: var(--muted); border: 1.5px solid var(--pink-mid);
+    border-radius: 999px; font-size: 13px; cursor: pointer;
+    font-family: inherit; margin-top: 8px; transition: all 0.2s;
+  }
+  .btn-clear:hover { border-color: var(--pink); color: var(--pink); }
+
+    /* ══ PAGE HEADER ══ */
+.shop-hero {
+  position: relative;
+  padding: 100px 60px 40px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.shop-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+}
+
+.shop-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 1;
+}
+
+.shop-hero-content {
+  position: relative;
+  z-index: 2;
+}
+.shop-hero .sec-tag { color:  #ffffff; }
+.shop-hero h1 { color: #ffffff; }
+.shop-hero h1 em { color: var(--pink); }
+.shop-hero p { color: rgba(255,255,255,0.85); }
+
+    /* ══ SHOP SECTION ══ */
+    .shop-section {
+      padding: 50px 60px 80px;
+      background: #fff;
+    }
+
+    .shop-filters {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 8px 22px;
+      border-radius: 20px;
+      border: 1.5px solid var(--pink-mid);
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: inherit;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: var(--pink);
+      border-color: var(--pink);
+      color: #fff;
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .product-card {
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(232, 85, 122, 0.15);
+    }
+
+    .product-card.hidden { display: none; }
+    .product-card.more-hidden { display: none; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    footer {
+      background: #1e1212;
+      color: rgba(255,255,255,0.6);
+      padding: 60px 60px 30px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+    .footer-brand .logo { display: block; margin-bottom: 14px; color: var(--pink-mid); font-size: 24px; }
+    .footer-brand p { font-size: 13px; line-height: 1.7; max-width: 240px; }
+    .footer-col h4 {
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: white;
+      margin-bottom: 16px;
+    }
+    .footer-col a {
+      display: block;
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      margin-bottom: 10px;
+      transition: color 0.2s;
+    }
+    .footer-col a:hover { color: var(--pink); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+    .footer-socials { display: flex; gap: 14px; }
+    .footer-socials a {
+      width: 34px; height: 34px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    .footer-socials a:hover { background: var(--pink); }
+
+    .product-img {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: var(--pink-light);
+      height: 220px;
+    }
+
+    .product-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .product-card:hover .product-img img { transform: scale(1.06); }
+
+    .wishlist-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.9);
+      color: var(--pink);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+      z-index: 2;
+    }
+
+    .wishlist-btn:hover,
+    .wishlist-btn.liked {
+      background: var(--pink);
+      color: #fff;
+    }
+
+    .product-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      padding: 12px;
+      background: linear-gradient(to top, rgba(45,31,31,0.6), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .product-card:hover .product-overlay { opacity: 1; }
+
+    .add-cart-btn {
+      width: 100%;
+      padding: 9px;
+      border-radius: 10px;
+      border: none;
+      background: var(--pink);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: background 0.2s ease;
+      font-family: inherit;
+    }
+
+    .add-cart-btn:hover { background: #d4446a; }
+
+    /* ── Search Bar ── */
+    .shop-search-wrap {
+      position: relative;
+      max-width: 480px;
+      margin: 0 auto 28px;
+    }
+    .shop-search-wrap input {
+      width: 100%; padding: 12px 20px 12px 46px;
+      border-radius: 999px; border: 1.5px solid var(--pink-mid);
+      background: var(--cream); font-family: 'DM Sans', sans-serif;
+      font-size: 14px; color: var(--text); outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .shop-search-wrap input:focus { border-color: var(--pink); box-shadow: 0 0 0 3px rgba(232,85,122,0.1); }
+    .shop-search-wrap .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--muted); pointer-events: none; }
+
+    .product-info {
+      padding: 10px 4px 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .product-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .product-price {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--pink);
+    }
+
+    .shop-footer {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .load-more-btn {
+      padding: 13px 40px;
+      border-radius: 30px;
+      border: 2px solid var(--pink);
+      background: transparent;
+      color: var(--pink);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: inherit;
+      letter-spacing: 0.04em;
+    }
+
+    .load-more-btn:hover {
+      background: var(--pink);
+      color: #fff;
+    }
+
+    .pagination { display: flex; gap: 8px; }
+
+    .page-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 1.5px solid var(--pink-mid); background: transparent;
+      color: var(--muted); font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.25s ease; font-family: inherit;
+    }
+
+    .page-btn:hover, .page-btn.active {
+      background: var(--pink); border-color: var(--pink); color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ CART OVERLAY + SIDEBAR ══ -->
+  <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+  <div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h3>My <em>Cart</em></h3>
+      <button class="cart-close" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <div class="cart-empty">
+        <p>🌸 Your cart is empty!</p>
+        <p>Add some flowers to get started.</p>
+      </div>
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total</span>
+        <span class="cart-total-price" id="cartTotal">₱0</span>
+      </div>
+      <button class="btn-checkout" onclick="checkout()">Proceed to Checkout →</button>
+      <button class="btn-clear" onclick="clearCart()">Clear Cart</button>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">Mystical Garden</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li class="nav-dropdown">
+        <a href="#">Occasions</a>
+        <div class="dropdown-menu">
+          <a href="occasions/wedding.html"    class="dropdown-item"> Wedding Venue</a>
+          <a href="occasions/proposal.html"   class="dropdown-item"> Proposal Setup</a>
+          <a href="occasions/birthday.html"   class="dropdown-item"> Birthday</a>
+          <a href="occasions/graduation.html" class="dropdown-item"> Graduation</a>
+        </div>
+      </li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="nav-cart" id="navCart" onclick="openCart(); return false;">
+        Add to Cart
+        <span class="cart-badge" id="cartBadge">0</span>
+      </a>
+      <a href="signin.html" class="nav-signin" id="navSignin">Sign In</a>
+      <a href="shop.html" class="nav-cta">Order Now</a>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="shop-hero">
+    <img src="Images/nav.jpg" class="shop-hero-img" alt="Shop Hero"/>
+    <div class="shop-hero-content">
+      <div class="sec-tag">Our Collection</div>
+      <h1>Shop <em>Flowers</em></h1>
+      <p>Handcrafted with love — browse our curated arrangements for every occasion.</p>
+    </div>
+  </div>
+
+  <!-- SHOP -->
+  <section class="shop-section">
+
+    <!-- Search Bar -->
+    <div class="shop-search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="shopSearch" placeholder="Search flowers, bouquets, gifts..."/>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="shop-filters">
+      <button class="filter-btn active" onclick="filterShop('all', this)">All</button>
+      <button class="filter-btn" onclick="filterShop('bouquet', this)">Bouquets</button>
+      <button class="filter-btn" onclick="filterShop('box', this)">Box Arrangements</button>
+      <button class="filter-btn" onclick="filterShop('custom', this)">Custom</button>
+      <button class="filter-btn" onclick="filterShop('gift', this)">Gift Sets</button>
+      <button class="filter-btn" onclick="filterShop('crochet', this)">Crochet</button>
+      <button class="filter-btn" onclick="filterShop('wedding', this)">Wedding</button>
+      <button class="filter-btn" onclick="filterShop('funeral', this)">Funeral</button>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="shop-grid" id="shopGrid">
+
+      <div class="product-card" data-category="bouquet">
+        <div class="product-img">
+          <img src="Images/rose bo.png" alt="Rose Bouquet"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay">
+            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Rose Bouquet</div>
+          <div class="product-price">₱900</div>
+        </div>
+      </div>
+
+      <div class="product-card" data-category="bouquet">
+        <div class="product-img">
+          <img src="Images/peo.jpg" alt="Pink Peony Wrap"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay">
+            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Pink Peony Wrap</div>
+          <div class="product-price">₱900</div>
+        </div>
+      </div>
+
+      <div class="product-card" data-category="box">
+        <div class="product-img">
+          <img src="Images/box.jpg" alt="Pastel Box Set"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay">
+            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Pastel Box Set</div>
+          <div class="product-price">₱350</div>
+        </div>
+      </div>
+
+      <div class="product-card" data-category="bouquet">
+        <div class="product-img">
+          <img src="Images/mixed.jpg" alt="Mixed Bloom Bouquet"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay">
+            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Mixed Bloom Bouquet</div>
+          <div class="product-price">₱1200</div>
+        </div>
+      </div>
+
+      <div class="product-card" data-category="custom">
+        <div class="product-img">
+          <img src="Images/custom.jpg" alt="Custom Wrap"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay">
+            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Custom Wrap</div>
+          <div class="product-price">₱860</div>
+        </div>
+      </div>
+
+      <div class="product-card" data-category="bouquet">
+        <div class="product-img">
+          <img src="Images/soft.jpg" alt="Soft Pink Bouquet"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay">
+            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Soft Pink Bouquet</div>
+          <div class="product-price">₱950</div>
+        </div>
+      </div>
+
+      <div class="product-card" data-category="gift">
+        <div class="product-img">
+          <img src="Images/big box.jpg" alt="Gift Bundle Set"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay">
+            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Gift Bundle Set</div>
+          <div class="product-price">₱550</div>
+        </div>
+      </div>
+
+      <div class="product-card" data-category="bouquet">
+        <div class="product-img">
+          <img src="Images/tumbelina.jpg" alt="Garden Rose Wrap"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay">
+            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Garden Rose Wrap</div>
+          <div class="product-price">₱1,500</div>
+        </div>
+      </div>
+
+      <div class="product-card" data-category="box">
+        <div class="product-img">
+          <img src="Images/bloom.jpg" alt="Bloom Box"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay">
+            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Bloom Box</div>
+          <div class="product-price">₱890</div>
+        </div>
+      </div>
+
+      <div class="product-card" data-category="custom">
+        <div class="product-img">
+          <img src="Images/arrange.jpg" alt="Custom Arrangement"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay">
+            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Makeup Arrangement</div>
+          <div class="product-price">₱2,000</div>
+        </div>
+      </div>
+
+      <div class="product-card" data-category="bouquet">
+        <div class="product-img">
+          <img src="Images/premium.jpg" alt="Premium Rose Set"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay">
+            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Premium Rose Set</div>
+          <div class="product-price">₱2,000</div>
+        </div>
+      </div>
+
+      <div class="product-card" data-category="gift">
+        <div class="product-img">
+          <img src="Images/sweet.jpg" alt="Sweet Gift Set"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay">
+            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Sweet Gift Set</div>
+          <div class="product-price">₱1,050</div>
+        </div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="crochet">
+        <div class="product-img">
+          <img src="Images/brown croc.jpg" alt="Crochet Rose Bouquet"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Crochet Rose Bouquet</div><div class="product-price">₱960</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="crochet">
+        <div class="product-img">
+          <img src="Images/cro tul.jpg" alt="Crochet Tulip Bouquet"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Crochet Tulip Bouquet</div><div class="product-price">₱815</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="crochet">
+        <div class="product-img">
+          <img src="Images/cro mixed.jpg" alt="Crochet Mixed Bouquet"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Crochet Mixed Bouquet</div><div class="product-price">₱900</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="crochet">
+        <div class="product-img">
+          <img src="Images/cro sun.jpg" alt="Crochet Sunflower Bouquet"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Crochet Sunflower Bouquet</div><div class="product-price">₱950</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="wedding">
+        <div class="product-img">
+          <img src="Images/bridal cas.jpg" alt="Bridal Bouquet"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Bridal Bouquet</div><div class="product-price">₱850</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="wedding">
+        <div class="product-img">
+          <img src="Images/central.jpg" alt="Wedding Centerpiece"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Wedding Centerpiece</div><div class="product-price">₱1,200</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="wedding">
+        <div class="product-img">
+          <img src="Images/chrcu.jpg" alt="Church Floral Arch"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Church Floral Arch</div><div class="product-price">₱5,000</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="wedding">
+        <div class="product-img">
+          <img src="Images/bridal round.jpg" alt="Flower Girl Basket"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Bridal Flower Round</div><div class="product-price">₱700</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="wedding">
+        <div class="product-img">
+          <img src="Images/bridal.jpg" alt="Wedding Venue Arrangement"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Bridesmaids Flower Arrangement</div><div class="product-price">₱450</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="funeral">
+        <div class="product-img">
+          <img src="Images/wreath.jpg" alt="White Wreath"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">White Wreath</div><div class="product-price">₱2,500</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="funeral">
+        <div class="product-img">
+          <img src="Images/sym.jpg" alt="Sympathy Bouquet"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Sympathy Bouquet</div><div class="product-price">₱1,000</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="funeral">
+        <div class="product-img">
+          <img src="Images/stand.jpg" alt="Standing Flower Wreath"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Standing Flower Wreath</div><div class="product-price">₱3,000</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="funeral">
+        <div class="product-img">
+          <img src="Images/casket.jpg" alt="Casket Flower Spray"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Casket Flower Spray</div><div class="product-price">₱2,000</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="funeral">
+        <div class="product-img">
+          <img src="Images/ros.jpg" alt="White Rose Tribute"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">White Rose Tribute</div><div class="product-price">₱1,500</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="funeral">
+        <div class="product-img">
+          <img src="Images/cond.jpg" alt="Condolence Arrangement"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Condolence Arrangement</div><div class="product-price">₱1,300</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="funeral">
+        <div class="product-img">
+          <img src="Images/Memorial.jpg" alt="Memorial Flower Crown"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Memorial Flower Crown</div><div class="product-price">₱2,700</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="bouquet">
+        <div class="product-img">
+          <img src="Images/tulips.jpg" alt="Tulip Bouquet"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Tulip Bouquet</div><div class="product-price">₱900</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="custom">
+        <div class="product-img">
+          <img src="Images/sun.jpg" alt="Sunflower Mix"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Sunflower Mix</div><div class="product-price">₱1,090</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="box">
+        <div class="product-img">
+          <img src="Images/valentines.jpg" alt="Luxury Box"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Luxury Box</div><div class="product-price">₱790</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="gift">
+        <div class="product-img">
+          <img src="Images/tead.jpg" alt="Teddy Bear Set"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Teddy Bear Set</div><div class="product-price">₱650</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="bouquet">
+        <div class="product-img">
+          <img src="Images/daisy.jpg" alt="Daisy Mixed Wrap"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Daisy Mixed Wrap</div><div class="product-price">₱750</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="bouquet">
+        <div class="product-img">
+          <img src="Images/boq purp.jpg" alt="Lavender Bouquet"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Lavender Bouquet</div><div class="product-price">₱1,010</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="custom">
+        <div class="product-img">
+          <img src="Images/kpop.jpg" alt="Kpop Custom"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Kpop Custom</div><div class="product-price">₱1,200</div></div>
+      </div>
+
+      <div class="product-card more-hidden" data-category="gift">
+        <div class="product-img">
+          <img src="Images/sweet.jpg" alt="Chocolate Gift Set"/>
+          <button class="wishlist-btn">♡</button>
+          <div class="product-overlay"><button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button></div>
+        </div>
+        <div class="product-info"><div class="product-name">Chocolate Gift Set</div><div class="product-price">₱815</div></div>
+      </div>
+
+    </div>
+
+    <div class="shop-footer">
+      <button class="load-more-btn" onclick="loadMore()">Show More ↓</button>
+    </div>
+
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="logo">Mystical Garden</span>
+        <p>Crafting beautiful floral arrangements for every moment, milestone, and memory. Fresh blooms, same-day delivery.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Core Features</h4>
+        <a href="#">Same Day Delivery</a>
+        <a href="#">Custom Bouquets</a>
+        <a href="#">Event Florals</a>
+        <a href="#">Gift Packages</a>
+      </div>
+      <div class="footer-col">
+        <h4>Learn More</h4>
+        <a href="#">Blog</a>
+        <a href="#">Case Studies</a>
+        <a href="#">Customer Stories</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="#">Contact</a>
+        <a href="#">Support</a>
+        <a href="#">Legal</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Mystical Garden All rights reserved.</span>
+      <div class="footer-socials">
+        <a href="https://www.instagram.com/won_jww" target="_blank">📸</a>
+        <a href="https://www.twitter.com/aea29858" target="_blank">🐦</a>
+        <a href="https://mail.google.com/mail/?view=cm&to=aea29858@gmail.com" target="_blank">💼</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ══ CART SYSTEM (localStorage) ══
+    let cart = JSON.parse(localStorage.getItem('mg_cart')) || [];
+
+    function saveCart() {
+      localStorage.setItem('mg_cart', JSON.stringify(cart));
+    }
+
+    function updateBadge() {
+      const total = cart.reduce((sum, item) => sum + item.qty, 0);
+      const badge = document.getElementById('cartBadge');
+      badge.textContent = total;
+      badge.classList.toggle('show', total > 0);
+    }
+
+    function updateTotal() {
+      const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      document.getElementById('cartTotal').textContent = '₱' + total.toLocaleString();
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cartItems');
+      if (cart.length === 0) {
+        container.innerHTML = '<div class="cart-empty"><p>🌸 Your cart is empty!</p><p>Add some flowers to get started.</p></div>';
+        updateTotal();
+        return;
+      }
+      container.innerHTML = cart.map((item, i) => `
+        <div class="cart-item">
+          <img class="cart-item-img" src="${item.img}" alt="${item.name}" onerror="this.style.background='var(--pink-light)'"/>
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-price">₱${item.price.toLocaleString()}</div>
+            <div class="cart-item-qty">
+              <button class="qty-btn" onclick="changeQty(${i}, -1)">−</button>
+              <span class="qty-num">${item.qty}</span>
+              <button class="qty-btn" onclick="changeQty(${i}, 1)">+</button>
+            </div>
+          </div>
+          <button class="cart-item-remove" onclick="removeItem(${i})">✕</button>
+        </div>
+      `).join('');
+      updateTotal();
+    }
+
+    function addToCart(btn) {
+      const card = btn.closest('.product-card');
+      const name = card.querySelector('.product-name').textContent;
+      const priceText = card.querySelector('.product-price').textContent.replace(/[₱,]/g, '');
+      const price = parseInt(priceText);
+      const img = card.querySelector('.product-img img').src;
+
+      const existing = cart.find(item => item.name === name);
+      if (existing) {
+        existing.qty++;
+      } else {
+        cart.push({ name, price, img, qty: 1 });
+      }
+
+      saveCart();
+      updateBadge();
+
+      btn.textContent = '✓ Added!';
+      btn.style.background = '#4caf82';
+      setTimeout(() => {
+        btn.textContent = 'Add to Cart';
+        btn.style.background = '';
+      }, 1500);
+    }
+
+    function changeQty(index, delta) {
+      cart[index].qty += delta;
+      if (cart[index].qty <= 0) cart.splice(index, 1);
+      saveCart();
+      updateBadge();
+      renderCart();
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      saveCart();
+      updateBadge();
+      renderCart();
+    }
+
+    function clearCart() {
+      cart = [];
+      saveCart();
+      updateBadge();
+      renderCart();
+    }
+
+    function openCart() {
+      document.getElementById('cartSidebar').classList.add('open');
+      document.getElementById('cartOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      renderCart();
+    }
+
+    function closeCart() {
+      document.getElementById('cartSidebar').classList.remove('open');
+      document.getElementById('cartOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function checkout() {
+      const user = JSON.parse(localStorage.getItem('mg_user'));
+      if (!user) {
+        closeCart();
+        window.location.href = 'signin.html';
+      } else {
+        closeCart();
+        window.location.href = 'checkout.html';
+      }
+    }
+
+    // ── FILTER ──
+    function filterShop(category, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.product-card').forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    // ── WISHLIST ──
+    document.querySelectorAll('.wishlist-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        this.classList.toggle('liked');
+        this.textContent = this.classList.contains('liked') ? '♥' : '♡';
+      });
+    });
+
+    // ── SEARCH ──
+    document.getElementById('shopSearch').addEventListener('input', function () {
+      const q = this.value.toLowerCase().trim();
+      document.querySelectorAll('.product-card').forEach(card => {
+        const name = card.querySelector('.product-name').textContent.toLowerCase();
+        const cat = card.dataset.category.toLowerCase();
+        const match = !q || name.includes(q) || cat.includes(q);
+        card.style.display = match ? 'block' : 'none';
+      });
+    });
+
+    // ── SHOW MORE ──
+    function loadMore() {
+      document.querySelectorAll('.product-card.more-hidden').forEach(card => {
+        card.classList.remove('more-hidden');
+        card.style.animation = 'fadeIn 0.4s ease';
+      });
+      document.querySelector('.load-more-btn').style.display = 'none';
+    }
+
+    // ── INIT ──
+    window.addEventListener('DOMContentLoaded', () => {
+      updateBadge();
+
+      const user = JSON.parse(localStorage.getItem('mg_user'));
+      if (user) {
+        const signin = document.getElementById('navSignin');
+        signin.textContent = 'Hi, ' + user.name.split(' ')[0] + '!';
+        signin.href = '#';
+      }
+
+      const cards = document.querySelectorAll('.product-card');
+      cards.forEach((card, i) => {
+        if (i >= 12) card.classList.add('more-hidden');
+      });
+      const hidden = document.querySelectorAll('.product-card.more-hidden').length;
+      if (hidden === 0) document.querySelector('.load-more-btn').style.display = 'none';
+    });
+      window.addEventListener('DOMContentLoaded', () => {
+  const user = JSON.parse(localStorage.getItem('mg_user'));
+  const signinBtn = document.getElementById('navSignin');
+  if (user && signinBtn) {
+    signinBtn.innerHTML = `Hi, ${user.name.split(' ')[0]}! &nbsp;|&nbsp; <span onclick="logOut()" style="cursor:pointer;color:var(--pink)">Logout</span>`;
+    signinBtn.href = '#';
+  }
+});
+
+function logOut() {
+  localStorage.removeItem("mg_user");
+  localStorage.removeItem("mg_cart"); // CLEAR CART
+  window.location.href = "index.html";
+}
+  </script>
+
+</body>
+</html>

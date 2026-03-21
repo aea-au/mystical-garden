@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mystical Garden — Birthday</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --pink: #e8557a; --pink-light: #fce8ee; --pink-mid: #f5c6d4;
+      --cream: #fdf6f0; --text: #2d1f1f; --muted: #9a7070;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); overflow-x: hidden; }
+
+    /* ══ NAV ══ */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 60px;
+      background: rgba(253,246,240,0.97);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(232,85,122,0.1);
+    }
+    .logo { font-family: 'Playfair Display', serif; font-size: 22px; font-style: italic; color: var(--pink); letter-spacing: 0.02em; text-decoration: none; }
+    .nav-links { display: flex; flex-direction: row; gap: 32px; list-style: none; align-items: center; }
+    .nav-links a { text-decoration: none; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); font-weight: 500; transition: color 0.2s; white-space: nowrap; }
+    .nav-links a:hover, .nav-links a.active { color: var(--pink); }
+
+    .nav-dropdown { position: relative; }
+    .nav-dropdown > a { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+    .nav-dropdown > a::after { content: '▾'; font-size: 11px; transition: transform 0.2s; }
+    .nav-dropdown:hover > a::after { transform: rotate(180deg); }
+
+    .dropdown-menu {
+      position: absolute; top: calc(100% + 14px); left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(45,31,31,0.15);
+      border: 1px solid var(--pink-mid); padding: 10px;
+      min-width: 220px; opacity: 0; visibility: hidden;
+      transition: all 0.25s ease; z-index: 300;
+    }
+    .nav-dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    .dropdown-menu::before {
+      content: ''; position: absolute; top: -7px; left: 50%;
+      width: 14px; height: 14px; background: #fff;
+      border-left: 1px solid var(--pink-mid); border-top: 1px solid var(--pink-mid);
+      transform: translateX(-50%) rotate(45deg);
+    }
+    .dropdown-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+      border-radius: 10px; text-decoration: none; color: var(--text);
+      font-size: 13px; font-weight: 500; transition: background 0.2s, color 0.2s;
+      white-space: nowrap; letter-spacing: 0; text-transform: none;
+    }
+    .dropdown-item:hover { background: var(--pink-light); color: var(--pink); }
+    .dropdown-item.active-occasion { background: var(--pink-light); color: var(--pink); font-weight: 600; }
+    .d-emoji { font-size: 15px; }
+
+    .nav-actions { display: flex; flex-direction: row; align-items: center; gap: 16px; }
+    .nav-cart, .nav-signin { text-decoration: none; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); font-weight: 500; transition: color 0.2s; white-space: nowrap; }
+    .nav-cart:hover, .nav-signin:hover { color: var(--pink); }
+    .nav-cta { background: var(--pink); color: white !important; padding: 10px 22px; border-radius: 999px; font-size: 12px !important; text-decoration: none; white-space: nowrap; transition: background 0.2s; }
+    .nav-cta:hover { background: #d44068; }
+
+    /* ══ HERO ══ */
+    .occasion-hero {
+      min-height: 45vh; padding: 140px 60px 60px;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center;
+      position: relative; overflow: hidden;
+      background-size: cover; background-position: center;
+    }
+    .occasion-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+}
+    .occasion-hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.25)); }
+    .occasion-hero-content { position: relative; z-index: 2; }
+    .sec-tag { display: inline-block; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.4); padding: 6px 16px; border-radius: 999px; margin-bottom: 16px; background: rgba(255,255,255,0.15); backdrop-filter: blur(4px); }
+    .occasion-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 5vw, 60px); color: #fff; margin-bottom: 12px; }
+    .occasion-hero h1 em { color: var(--pink-mid); font-style: italic; }
+    .occasion-hero p { color: rgba(255,255,255,0.85); font-size: 15px; max-width: 480px; line-height: 1.7; }
+
+    /* ══ PRODUCTS ══ */
+    .products-section { padding: 50px 60px 80px; background: #fff; }
+    .products-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+    .products-header h2 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--text); }
+    .products-header h2 em { color: var(--pink); font-style: italic; }
+    .products-count { color: var(--muted); font-size: 13px; }
+
+    .products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+
+    .product-card { background: #fff; border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(232,85,122,0.15); }
+
+    .product-img { position: relative; overflow: hidden; border-radius: 16px; background: var(--pink-light); height: 220px; }
+    .product-img img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; transition: transform 0.4s ease; }
+    .product-card:hover .product-img img { transform: scale(1.06); }
+
+    .wishlist-btn { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(255,255,255,0.9); color: var(--pink); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.25s ease; z-index: 2; }
+    .wishlist-btn:hover, .wishlist-btn.liked { background: var(--pink); color: #fff; }
+
+    .product-card:hover .product-overlay { opacity: 1; }
+    .product-info { padding: 10px 4px 6px; display: flex; justify-content: space-between; align-items: center; }
+    .product-name { font-size: 13px; font-weight: 600; color: var(--text); }
+
+.occasion-desc {
+  position: relative;
+  padding: 60px 60px 60px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.occasion-desc-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+}
+
+.occasion-desc-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1;
+}
+
+.occasion-desc-content {
+  position: relative;
+  z-index: 2;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.occasion-desc h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  color: var(--pink-mid);
+  margin-bottom: 16px;
+}
+
+.occasion-desc p {
+  font-size: 15px;
+  line-height: 1.9;
+  color: rgba(255,255,255,0.85);
+}
+  .booking-section {
+    padding: 70px 60px;
+    background: var(--pink-light);
+  }
+
+  .booking-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .booking-header .sec-tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--pink);
+    margin-bottom: 10px;
+  }
+  .booking-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 3.5vw, 38px);
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .booking-header h2 em { color: var(--pink); font-style: italic; }
+  .booking-header p { color: var(--muted); font-size: 14px; max-width: 440px; margin: 0 auto; line-height: 1.6; }
+
+  /* ── SPLIT LAYOUT ── */
+  .booking-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 1000px;
+    margin: 0 auto;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(232,85,122,0.12);
+    border: 1px solid var(--pink-mid);
+  }
+
+  /* LEFT — image */
+  .booking-img {
+    position: relative;
+    min-height: 500px;
+  }
+  .booking-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+  .booking-img-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(30,10,10,0.5) 0%, transparent 60%);
+  }
+
+  /* RIGHT — form */
+  .booking-form {
+    background: #fff;
+    padding: 40px 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .form-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--pink);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1.5px solid var(--pink-mid);
+  }
+
+  .form-group { margin-bottom: 12px; }
+
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .booking-form label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 5px;
+  }
+
+  .booking-form input[type="text"],
+  .booking-form input[type="date"],
+  .booking-form input[type="tel"],
+  .booking-form input[type="email"],
+  .booking-form textarea {
+    width: 100%;
+    padding: 9px 13px;
+    border-radius: 10px;
+    border: 1.5px solid var(--pink-mid);
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+
+  .booking-form input:focus,
+  .booking-form textarea:focus {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px rgba(232,85,122,0.1);
+  }
+
+  .booking-form textarea { resize: none; height: 80px; }
+
+  .payment-options { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+  .payment-option { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text); cursor: pointer; }
+  .payment-option input[type="radio"] { width: auto; accent-color: var(--pink); }
+
+  .form-divider { border: none; border-top: 1px solid var(--pink-mid); margin: 14px 0; }
+
+  .btn-submit {
+    width: 100%;
+    background: var(--pink);
+    color: white;
+    padding: 12px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.25s;
+    box-shadow: 0 8px 24px rgba(232,85,122,0.3);
+    margin-top: 16px;
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(232,85,122,0.45); }
+  .form-note { font-size: 11px; color: var(--muted); margin-top: 8px; text-align: center; }
+
+    /* ══ FOOTER ══ */
+    footer { background: #1e1212; color: rgba(255,255,255,0.6); padding: 60px 60px 30px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+    .footer-brand .logo { display: block; margin-bottom: 14px; color: var(--pink-mid); font-size: 24px; }
+    .footer-brand p { font-size: 13px; line-height: 1.7; max-width: 240px; }
+    .footer-col h4 { font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: white; margin-bottom: 16px; }
+    .footer-col a { display: block; font-size: 13px; color: rgba(255,255,255,0.5); text-decoration: none; margin-bottom: 10px; transition: color 0.2s; }
+    .footer-col a:hover { color: var(--pink); }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+    .footer-socials { display: flex; gap: 14px; }
+    .footer-socials a { width: 34px; height: 34px; background: rgba(255,255,255,0.07); border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; transition: background 0.2s; }
+    .footer-socials a:hover { background: var(--pink); }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">Mystical Garden</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../shop.html">Shop</a></li>
+      <li class="nav-dropdown">
+        <a href="#" class="active">Occasions</a>
+        <div class="dropdown-menu">
+          <a href="wedding.html"   class="dropdown-item "> Wedding Venue</a>
+          <a href="proposal.html"  class="dropdown-item "> Proposal Setup</a>
+          <a href="birthday.html"  class="dropdown-item active-occasion"> Birthday</a>
+          <a href="graduation.html" class="dropdown-item "> Graduation</a>
+        </div>
+      </li>
+      <li><a href="../gallery.html">Gallery</a></li>
+      <li><a href="../about.html">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="nav-cart">Add to Cart</a>
+        <a href="../Signin.html" class="nav-signin" id="navSignin">Sign In</a>
+      <a href="../shop.html" class="nav-cta">Order Now</a>
+    </div>
+  </nav>
+
+<div class="occasion-hero">
+  <img src="../Images/birth.jpg" class="occasion-hero-img" alt="occasion-hero"/>
+  <div class="occasion-hero-overlay"></div>
+  <div class="occasion-hero-content">
+    <h1><em>Birthday</em></h1>
+    <p>Make their special day even more magical with a stunning bloom.</p>
+  </div>
+</div>
+  <section class="products-section">
+    <div class="products-header">
+      <h2>Birthday <em>Collection</em></h2>
+      <span class="products-count">Showing all products</span>
+    </div>
+    <div class="products-grid">
+      
+      <div class="product-card">
+        <div class="product-img">
+          <img src="../Images/Birthday Bouquet.jpg" alt="Birthday Bouquet"/>
+          <button class="wishlist-btn">&#9825;</button>
+        </div>
+        <div class="product-info"><div class="product-name">Birthday Bouquet</div></div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">
+          <img src="../Images/Pastel Birthday Wrap.jpg" alt="Birthday Cake"/>
+          <button class="wishlist-btn">&#9825;</button>
+        </div>
+        <div class="product-info"><div class="product-name"> Birthday Cake</div></div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">
+          <img src="../Images/Celebration Box.jpg" alt="Celebration Box"/>
+          <button class="wishlist-btn">&#9825;</button>
+        </div>
+        <div class="product-info"><div class="product-name">Celebration Box</div></div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">
+          <img src="../Images/Birthday Set.jpg" alt="Birthday Preparation"/>
+          <button class="wishlist-btn">&#9825;</button>
+        </div>
+        <div class="product-info"><div class="product-name">Birthday Preparation</div></div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">
+         <img src="../Images/Flower Basket.jpg"> alt="Flower Basket"/>
+          <button class="wishlist-btn">&#9825;</button>
+        </div>
+        <div class="product-info"><div class="product-name">Flower Basket</div></div>
+      </div>
+    </div>
+  </section>
+
+<!-- DESCRIPTION -->
+<div class="occasion-desc">
+  <img src="../Images/debu.jpg" class="occasion-desc-img" alt="Wedding"/>
+  <div class="occasion-desc-overlay"></div>
+  <div class="occasion-desc-content">
+    <h2>Make Their Birthday Extra Special With Fresh Blooms</h2>
+    <p>Birthdays only come once a year — make it count! There's no better way to show someone how much they mean to you than with a stunning hand-crafted bouquet from Mystical Garden. Whether it's for your best friend, your mom, or your special someone, our fresh and vibrant arrangements are guaranteed to put a big smile on their face. Because everyone deserves to feel like royalty on their birthday!</p>
+    <br>
+   <b><p>Happy Birthday to everyone! more candles to come</p></b> 
+</div>
+</div>
+
+<section class="booking-section">
+  <div class="booking-header">
+    <div class="sec-tag">✦ Reserve Your Arrangement</div>
+    <h2>Flower <em>Order Form</em></h2>
+    <p>"Made with love, just for your special moments"</p>
+  </div>
+
+  <div class="booking-wrap">
+
+    <!-- LEFT — image -->
+    <div class="booking-img">
+      <img src="../Images/birth.jpg" alt="Booking"/>  
+      <div class="booking-img-overlay"></div>
+    </div>
+
+    <!-- RIGHT — form -->
+    <form class="booking-form">
+      <div class="form-section-title">Customer Details</div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" placeholder="Linda Walker"/>
+        </div>
+        <div class="form-group">
+          <label>Phone / Viber</label>
+          <input type="tel" placeholder="09XX XXX XXXX"/>
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="linda719@gmail.com"/>
+        </div>
+        <div class="form-group">
+          <label>Event Date</label>
+          <input type="date"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Delivery / Drop-Off Address</label>
+        <input type="text" placeholder="Pasig City"/>
+      </div>
+
+      <hr class="form-divider"/>
+
+      <div class="form-section-title">Preferred Payment</div>
+      <div class="payment-options">
+        <label class="payment-option"><input type="radio" name="payment" value="cash"/> Cash</label>
+        <label class="payment-option"><input type="radio" name="payment" value="gcash"/> GCash</label>
+        <label class="payment-option"><input type="radio" name="payment" value="maya"/> Maya</label>
+        <label class="payment-option"><input type="radio" name="payment" value="bank"/> Bank Transfer</label>
+        <label class="payment-option"><input type="radio" name="payment" value="other"/> Other</label>
+      </div>
+
+      <hr class="form-divider"/>
+
+      <div class="form-section-title">Message</div>
+      <div class="form-group">
+        <textarea placeholder="Tell us about your order..."></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit">Submit Booking Request</button>
+      <p class="form-note">We will contact you within 24 hours to confirm your booking</p>
+    </form></div></section>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="logo">Mystical Garden</span>
+        <p>Crafting beautiful floral arrangements for every moment, milestone, and memory.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Core Features</h4>
+        <a href="#">Same Day Delivery</a>
+        <a href="#">Custom Bouquets</a>
+        <a href="#">Event Florals</a>
+        <a href="#">Gift Packages</a>
+      </div>
+      <div class="footer-col">
+        <h4>Learn More</h4>
+        <a href="#">Blog</a>
+        <a href="#">Case Studies</a>
+        <a href="#">Customer Stories</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="#">Contact</a>
+        <a href="#">Support</a>
+        <a href="#">Legal</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Mystical Garden All rights reserved.</span>
+      <div class="footer-socials">
+        <a href="https://www.instagram.com/won_jww" target="_blank">📸</a>
+      <a href="https://www.twitter.com/aea29858" target="_blank">🐦</a>
+     <a href="https://mail.google.com/mail/?view=cm&to=aea29858@gmail.com" target="_blank">💼</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.wishlist-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        this.classList.toggle('liked');
+        this.textContent = this.classList.contains('liked') ? '♥' : '♡';
+      });
+    });
+    function addToCart(btn) {
+      btn.textContent = '✓ Added!';
+      btn.style.background = '#4caf82';
+      setTimeout(() => { btn.textContent = 'Add to Cart'; btn.style.background = ''; }, 1500);
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+  const user = JSON.parse(localStorage.getItem('mg_user'));
+  const signinBtn = document.getElementById('navSignin');
+  if (user && signinBtn) {
+    signinBtn.innerHTML = `Hi, ${user.name.split(' ')[0]}! &nbsp;|&nbsp; <span onclick="logOut()" style="cursor:pointer;color:var(--pink)">Logout</span>`;
+    signinBtn.href = '#';
+  }
+});
+
+function logOut() {
+  localStorage.removeItem("mg_user");
+  localStorage.removeItem("mg_cart"); // CLEAR CART
+  window.location.href = "index.html";
+}
+
+  </script>
+</body>
+</html>

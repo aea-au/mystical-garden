@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mystical Garden — Checkout</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --pink: #e8557a; --pink-light: #fce8ee; --pink-mid: #f5c6d4;
+      --cream: #fdf6f0; --text: #2d1f1f; --muted: #9a7070;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    body::before {
+      content: '🌸';
+      position: fixed; font-size: 400px; opacity: 0.04;
+      top: -100px; right: -100px; pointer-events: none; z-index: 0;
+    }
+
+    .checkout-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative; z-index: 1;
+    }
+
+    /* ── Top bar ── */
+    .checkout-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 36px;
+    }
+    .checkout-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-style: italic;
+      color: var(--pink); text-decoration: none;
+    }
+    .back-btn {
+      font-size: 13px; color: var(--muted);
+      text-decoration: none; transition: color 0.2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .back-btn:hover { color: var(--pink); }
+
+    /* ── Header ── */
+    .checkout-header { margin-bottom: 32px; }
+    .checkout-header .sec-tag {
+      display: inline-block; font-size: 11px; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--pink);
+      border: 1px solid var(--pink-mid); padding: 5px 14px;
+      border-radius: 999px; margin-bottom: 12px; background: var(--pink-light);
+    }
+    .checkout-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 4vw, 40px); color: var(--text);
+    }
+    .checkout-header h1 em { color: var(--pink); font-style: italic; }
+
+    /* ── Grid layout ── */
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 28px;
+      align-items: start;
+    }
+
+    /* ── Card ── */
+    .checkout-card {
+      background: white;
+      border-radius: 20px;
+      padding: 32px;
+      border: 1px solid var(--pink-mid);
+      box-shadow: 0 4px 24px rgba(232,85,122,0.07);
+    }
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; color: var(--text); margin-bottom: 24px;
+    }
+    .card-title em { color: var(--pink); font-style: italic; }
+
+    /* ── Form ── */
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block; font-size: 12px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 8px;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%; padding: 12px 16px;
+      border: 1.5px solid var(--pink-mid); border-radius: 12px;
+      background: var(--cream); font-family: 'DM Sans', sans-serif;
+      font-size: 14px; color: var(--text); outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group textarea { resize: none; height: 80px; }
+    .form-group input:focus, .form-group textarea:focus {
+      border-color: var(--pink);
+      box-shadow: 0 0 0 3px rgba(232,85,122,0.1);
+    }
+    .form-group input[readonly] {
+      background: var(--pink-light); color: var(--muted); cursor: not-allowed;
+    }
+
+    /* ── Payment options ── */
+    .payment-options { display: flex; flex-direction: column; gap: 10px; }
+    .payment-option {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px; border-radius: 12px;
+      border: 1.5px solid var(--pink-mid); cursor: pointer;
+      transition: all 0.2s; background: var(--cream);
+    }
+    .payment-option:hover { border-color: var(--pink); background: var(--pink-light); }
+    .payment-option input[type="radio"] { accent-color: var(--pink); width: 16px; height: 16px; }
+    .payment-option.selected { border-color: var(--pink); background: var(--pink-light); }
+    .payment-label { font-size: 14px; font-weight: 500; }
+    .payment-icon { font-size: 20px; }
+
+    /* ── Order summary ── */
+    .order-items { margin-bottom: 20px; }
+    .order-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0; border-bottom: 1px solid var(--pink-light);
+    }
+    .order-item-img {
+      width: 52px; height: 52px; border-radius: 10px;
+      object-fit: cover; background: var(--pink-light); flex-shrink: 0;
+    }
+    .order-item-info { flex: 1; }
+    .order-item-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .order-item-qty { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .order-item-price { font-size: 13px; font-weight: 700; color: var(--pink); }
+
+    .order-totals { margin-top: 16px; }
+    .order-row {
+      display: flex; justify-content: space-between;
+      font-size: 13px; color: var(--muted); margin-bottom: 8px;
+    }
+    .order-row.total {
+      font-size: 18px; font-weight: 700; color: var(--text);
+      border-top: 1px solid var(--pink-mid); padding-top: 12px; margin-top: 12px;
+    }
+    .order-row.total span:last-child { color: var(--pink); }
+
+    /* ── Place order button ── */
+    .btn-place-order {
+      width: 100%; padding: 16px;
+      background: var(--pink); color: white;
+      border: none; border-radius: 999px;
+      font-size: 15px; font-weight: 600; cursor: pointer;
+      font-family: inherit; transition: all 0.25s;
+      box-shadow: 0 6px 20px rgba(232,85,122,0.3);
+      margin-top: 20px;
+    }
+    .btn-place-order:hover { background: #d44068; transform: translateY(-2px); }
+
+    .secure-note {
+      text-align: center; font-size: 12px; color: var(--muted);
+      margin-top: 12px;
+    }
+
+    /* ── SUCCESS SCREEN ── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .success-screen.show { display: block; }
+    .success-icon { font-size: 72px; margin-bottom: 20px; }
+    .success-screen h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px; color: var(--text); margin-bottom: 12px;
+    }
+    .success-screen h2 em { color: var(--pink); font-style: italic; }
+    .success-screen p { color: var(--muted); font-size: 15px; line-height: 1.8; margin-bottom: 8px; }
+    .success-order-id {
+      display: inline-block; margin: 16px 0;
+      background: var(--pink-light); border: 1px solid var(--pink-mid);
+      padding: 10px 24px; border-radius: 999px;
+      font-size: 14px; font-weight: 600; color: var(--pink);
+    }
+    .btn-back-shop {
+      display: inline-block; margin-top: 24px;
+      padding: 14px 40px; background: var(--pink); color: white;
+      border-radius: 999px; text-decoration: none; font-size: 14px;
+      font-weight: 600; transition: all 0.25s;
+      box-shadow: 0 6px 20px rgba(232,85,122,0.3);
+    }
+    .btn-back-shop:hover { background: #d44068; transform: translateY(-2px); }
+  </style>
+</head>
+<body>
+
+  <div class="checkout-wrap">
+
+    <!-- Top bar -->
+    <div class="checkout-topbar">
+      <a href="index.html" class="checkout-logo">Mystical Garden</a>
+      <a href="index.html" class="back-btn">← Back to Shop</a>
+    </div>
+
+    <!-- Main checkout -->
+    <div id="checkoutMain">
+      <div class="checkout-header">
+        <div class="sec-tag">✦ Almost There</div>
+        <h1>Complete Your <em>Order</em></h1>
+      </div>
+
+      <div class="checkout-grid">
+
+        <!-- LEFT: Form -->
+        <div>
+          <!-- Delivery Details -->
+          <div class="checkout-card" style="margin-bottom: 20px;">
+            <div class="card-title">Delivery <em>Details</em></div>
+
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="checkName" readonly/>
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="text" id="checkEmail" readonly/>
+            </div>
+            <div class="form-group">
+              <label>Delivery Address</label>
+              <input type="text" id="checkAddress" placeholder="House No., Street, Barangay, City"/>
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="text" id="checkPhone" placeholder="e.g. 09XX XXX XXXX"/>
+            </div>
+            <div class="form-group">
+              <label>Note (Optional)</label>
+              <textarea id="checkNote" placeholder="Any special instructions for your order..."></textarea>
+            </div>
+          </div>
+
+          <!-- Payment -->
+          <div class="checkout-card">
+            <div class="card-title">Payment <em>Method</em></div>
+            <div class="payment-options">
+              <label class="payment-option">
+                <input type="radio" name="payment" value="gcash"/>
+                <span class="payment-label">GCash</span>
+              </label>
+              <label class="payment-option">
+                <input type="radio" name="payment" value="cod"/>
+                <span class="payment-label">Cash on Delivery</span>
+              </label>
+              <label class="payment-option">
+                <input type="radio" name="payment" value="bank"/>
+                <span class="payment-label">Bank Transfer</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Order Summary -->
+        <div class="checkout-card">
+          <div class="card-title">Order <em>Summary</em></div>
+          <div class="order-items" id="orderItems"></div>
+          <div class="order-totals">
+            <div class="order-row">
+              <span>Subtotal</span>
+              <span id="subtotal">₱0</span>
+            </div>
+            <div class="order-row">
+              <span>Delivery Fee</span>
+              <span>₱100</span>
+            </div>
+            <div class="order-row total">
+              <span>Total</span>
+              <span id="grandTotal">₱0</span>
+            </div>
+          </div>
+          <button class="btn-place-order" onclick="placeOrder()">Place Order 🌸</button>
+          <div class="secure-note">🔒 Your information is safe with us</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">🌸</div>
+      <h2>Order <em>Placed!</em></h2>
+      <p>Thank you for your order! We'll contact you within 24 hours to confirm your delivery.</p>
+      <div class="success-order-id" id="orderId"></div>
+      <p style="font-size: 13px;">A confirmation has been sent to <strong id="confirmEmail"></strong></p>
+      <a href="shop.html" class="btn-back-shop">Continue Shopping →</a>
+    </div>
+
+  </div>
+
+  <script>
+    let cart = JSON.parse(localStorage.getItem('mg_cart')) || [];
+    const user = JSON.parse(localStorage.getItem('mg_user'));
+
+    // Redirect if not signed in or cart empty
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!user) { window.location.href = 'signin.html'; return; }
+      if (cart.length === 0) { window.location.href = 'shop.html'; return; }
+
+      // Pre-fill user info
+      document.getElementById('checkName').value = user.name;
+      document.getElementById('checkEmail').value = user.email;
+
+      renderOrderSummary();
+    });
+
+    function renderOrderSummary() {
+      const container = document.getElementById('orderItems');
+      container.innerHTML = cart.map(item => `
+        <div class="order-item">
+          <img class="order-item-img" src="${item.img}" alt="${item.name}" onerror="this.style.background='var(--pink-light)'"/>
+          <div class="order-item-info">
+            <div class="order-item-name">${item.name}</div>
+            <div class="order-item-qty">x${item.qty}</div>
+          </div>
+          <div class="order-item-price">₱${(item.price * item.qty).toLocaleString()}</div>
+        </div>
+      `).join('');
+
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      document.getElementById('subtotal').textContent = '₱' + subtotal.toLocaleString();
+      document.getElementById('grandTotal').textContent = '₱' + (subtotal + 100).toLocaleString();
+    }
+
+    // Highlight selected payment
+    document.querySelectorAll('.payment-option input').forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+        radio.closest('.payment-option').classList.add('selected');
+      });
+    });
+
+    function placeOrder() {
+      const address = document.getElementById('checkAddress').value.trim();
+      const phone = document.getElementById('checkPhone').value.trim();
+      const payment = document.querySelector('input[name="payment"]:checked');
+
+      if (!address) { alert('Please enter your delivery address.'); return; }
+      if (!phone) { alert('Please enter your phone number.'); return; }
+      if (!payment) { alert('Please select a payment method.'); return; }
+
+      // Generate order ID
+      const orderId = 'MG-' + Date.now().toString().slice(-6);
+
+      // Clear cart
+      localStorage.removeItem('mg_cart');
+
+      // Show success
+      document.getElementById('checkoutMain').style.display = 'none';
+      document.getElementById('orderId').textContent = 'Order ID: ' + orderId;
+      document.getElementById('confirmEmail').textContent = user.email;
+      document.getElementById('successScreen').classList.add('show');
+    }
+  </script>
+
+</body>
+</html>

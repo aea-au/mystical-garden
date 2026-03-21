@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mystical Garden — Gallery</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --pink: #e8557a; --pink-light: #fce8ee; --pink-mid: #f5c6d4;
+      --cream: #fdf6f0; --text: #2d1f1f; --muted: #9a7070;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); overflow-x: hidden; }
+
+    /* ══ NAV ══ */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; padding: 18px 60px; background: rgba(253,246,240,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(232,85,122,0.1); }
+    .logo { font-family: 'Playfair Display', serif; font-size: 22px; font-style: italic; color: var(--pink); letter-spacing: 0.02em; text-decoration: none; }
+    .nav-links { display: flex; flex-direction: row; gap: 32px; list-style: none; align-items: center; }
+    .nav-links a { text-decoration: none; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); font-weight: 500; transition: color 0.2s; white-space: nowrap; }
+    .nav-links a:hover, .nav-links a.active { color: var(--pink); }
+    .nav-dropdown { position: relative; }
+    .nav-dropdown > a { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+    .nav-dropdown > a::after { content: '▾'; font-size: 11px; transition: transform 0.2s; }
+    .nav-dropdown:hover > a::after { transform: rotate(180deg); }
+    .dropdown-menu { position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(-8px); background: #fff; border-radius: 12px; box-shadow: 0 8px 30px rgba(45,31,31,0.12); border: 1px solid var(--pink-mid); padding: 8px; min-width: 200px; opacity: 0; visibility: hidden; transition: all 0.25s ease; z-index: 300; }
+    .dropdown-menu::before { display: none; }
+    .nav-dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    .dropdown-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: var(--text); font-size: 13px; font-weight: 500; transition: background 0.2s, color 0.2s; white-space: nowrap; letter-spacing: 0; text-transform: none; }
+    .dropdown-item:hover { background: var(--pink-light); color: var(--pink); }
+    .nav-actions { display: flex; align-items: center; gap: 16px; }
+    .nav-cart, .nav-signin { text-decoration: none; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); font-weight: 500; transition: color 0.2s; }
+    .nav-cart:hover, .nav-signin:hover { color: var(--pink); }
+    .nav-cta { background: var(--pink); color: white !important; padding: 10px 22px; border-radius: 999px; font-size: 12px !important; text-decoration: none; transition: background 0.2s; }
+    .nav-cta:hover { background: #d44068; }
+
+   /* ══ HERO ══ */
+.gallery-hero { min-height: 45vh; padding: 140px 60px 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; overflow: hidden; }
+.gallery-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: 0; }
+.gallery-hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.25)); z-index: 1; }
+.gallery-hero h1 { position: relative; z-index: 2; font-family: 'Playfair Display', serif; font-size: clamp(36px, 5vw, 56px); color: #fff; margin-bottom: 10px; }
+.gallery-hero h1 em { color: var(--pink-mid); font-style: italic; }
+.gallery-hero p { position: relative; z-index: 2; color: rgba(255,255,255,0.85); font-size: 15px; max-width: 460px; margin: 0 auto; line-height: 1.7; }
+    /* ══ SEARCH + FILTERS ══ */
+    .gallery-controls { padding: 36px 60px 0; background: #fff; }
+
+    .search-wrap { position: relative; max-width: 480px; margin: 0 auto 28px; }
+    .search-wrap input {
+      width: 100%; padding: 12px 20px 12px 46px;
+      border-radius: 999px; border: 1.5px solid var(--pink-mid);
+      background: var(--cream); font-family: 'DM Sans', sans-serif;
+      font-size: 14px; color: var(--text); outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-wrap input:focus { border-color: var(--pink); box-shadow: 0 0 0 3px rgba(232,85,122,0.1); }
+    .search-wrap .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--muted); pointer-events: none; }
+
+    /* Category tabs */
+    .cat-tabs { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; padding-bottom: 0; }
+    .cat-tab { padding: 8px 20px; border-radius: 999px; border: 1.5px solid var(--pink-mid); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .cat-tab:hover { border-color: var(--pink); color: var(--pink); }
+    .cat-tab.active { background: var(--pink); color: white; border-color: var(--pink); }
+
+    /* ══ GALLERY CONTENT ══ */
+    .gallery-content { padding: 40px 60px 80px; background: #fff; }
+
+    /* Category group */
+    .cat-group { margin-bottom: 56px; }
+    .cat-group-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .cat-group-header h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--text); white-space: nowrap; }
+    .cat-group-header h2 em { color: var(--pink); font-style: italic; }
+    .cat-group-line { flex: 1; height: 1px; background: var(--pink-mid); }
+    .cat-count { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+    /* Photo grid inside each category */
+    .cat-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+
+    .gallery-card { border-radius: 14px; overflow: hidden; cursor: pointer; position: relative; background: var(--pink-light); aspect-ratio: 1; transition: transform 0.3s, box-shadow 0.3s; }
+    .gallery-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(232,85,122,0.18); }
+    .gallery-card img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; transition: transform 0.4s; }
+    .gallery-card:hover img { transform: scale(1.06); }
+    .gallery-card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(45,31,31,0.5) 0%, transparent 50%); opacity: 0; transition: opacity 0.3s; display: flex; align-items: flex-end; padding: 12px; }
+    .gallery-card:hover .gallery-card-overlay { opacity: 1; }
+    .gallery-card-label { font-size: 12px; font-weight: 600; color: white; }
+
+    /* No results */
+    .no-results { text-align: center; padding: 60px 0; color: var(--muted); display: none; }
+    .no-results p { font-size: 15px; margin-top: 8px; }
+
+    /* ══ LIGHTBOX ══ */
+    .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s; }
+    .lightbox.open { opacity: 1; visibility: visible; }
+    .lightbox img { max-width: 80vw; max-height: 85vh; border-radius: 16px; object-fit: contain; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    .lightbox-close { position: absolute; top: 24px; right: 32px; font-size: 32px; color: white; cursor: pointer; line-height: 1; transition: color 0.2s; }
+    .lightbox-close:hover { color: var(--pink); }
+
+    /* ══ FOOTER ══ */
+    footer { background: #1e1212; color: rgba(255,255,255,0.6); padding: 60px 60px 30px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+    .footer-brand .logo { display: block; margin-bottom: 14px; color: var(--pink-mid); font-size: 24px; }
+    .footer-brand p { font-size: 13px; line-height: 1.7; max-width: 240px; }
+    .footer-col h4 { font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: white; margin-bottom: 16px; }
+    .footer-col a { display: block; font-size: 13px; color: rgba(255,255,255,0.5); text-decoration: none; margin-bottom: 10px; transition: color 0.2s; }
+    .footer-col a:hover { color: var(--pink); }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+    .footer-socials { display: flex; gap: 14px; }
+    .footer-socials a { width: 34px; height: 34px; background: rgba(255,255,255,0.07); border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; transition: background 0.2s; }
+    .footer-socials a:hover { background: var(--pink); }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">Mystical Garden</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li class="nav-dropdown">
+        <a href="#">Occasions</a>
+        <div class="dropdown-menu">
+          <a href="occasions/wedding.html"    class="dropdown-item"> Wedding Venue</a>
+          <a href="occasions/proposal.html"   class="dropdown-item"> Proposal Setup</a>
+          <a href="occasions/birthday.html"   class="dropdown-item"> Birthday</a>
+          <a href="occasions/funeral.html"    class="dropdown-item"> Funeral</a>
+          <a href="occasions/graduation.html" class="dropdown-item"> Graduation</a>
+        </div>
+      </li>
+      <li><a href="gallery.html" class="active">Gallery</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <a href="#" class="nav-cart">Add to Cart</a>
+      <a href="Signin.html" class="nav-signin" id="navSignin">Sign In</a>
+      <a href="shop.html" class="nav-cta">Order Now</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+<div class="gallery-hero">
+  <img src="Images/bg flowers.jpg" class="gallery-hero-img" alt="gallery-hero"/>
+  <div class="gallery-hero-overlay"></div>
+  <h1>Bloom <em>Gallery</em></h1>
+  <p>Browse our handcrafted arrangements — every petal made with love.</p>
+</div>
+
+  <!-- SEARCH + FILTERS -->
+  <div class="gallery-controls">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search by flower name or category..."/>
+    </div>
+    <div class="cat-tabs">
+      <button class="cat-tab active" onclick="filterCat('all', this)">All</button>
+      <button class="cat-tab" onclick="filterCat('bouquets', this)">Bouquets</button>
+      <button class="cat-tab" onclick="filterCat('box', this)">Box Arrangements</button>
+      <button class="cat-tab" onclick="filterCat('custom', this)">Custom</button>
+      <button class="cat-tab" onclick="filterCat('giftsets', this)">Gift Sets</button>
+      <button class="cat-tab" onclick="filterCat('crochet', this)">Crochet</button>
+      <button class="cat-tab" onclick="filterCat('wedding', this)">Wedding</button>
+      <button class="cat-tab" onclick="filterCat('funeral', this)">Funeral</button>
+    </div>
+  </div>
+
+  <!-- GALLERY -->
+  <div class="gallery-content">
+
+    <!-- BOUQUETS -->
+    <div class="cat-group" data-cat="bouquets">
+      <div class="cat-group-header">
+        <h2><em>Bouquets</em></h2>
+        <div class="cat-group-line"></div>
+        <span class="cat-count">6 photos</span>
+      </div>
+      <div class="cat-grid">
+        <div class="gallery-card" onclick="openLightbox('Images/red boq.jpg')">
+          <img src="Images\red boq.jpg" alt="Bouquet 1" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Rose</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/tumbelina3.jpg')">
+          <img src="Images\tumbelina3.jpg" alt="Bouquet 2" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Thumbelina</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/tulips.jpg')">
+          <img src="Images\tulips.jpg" alt="Bouquet 3" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Tulips</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/mixed.jpg')">
+          <img src="Images\mixed.jpg" alt="Bouquet 4" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Mixed</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/big heart.jpg')">
+          <img src="Images\big heart.jpg" alt="Bouquet 5" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Rose</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/peo.jpg')">
+          <img src="Images\peo.jpg" alt="Bouquet 6" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Peonies</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOX ARRANGEMENTS -->
+    <div class="cat-group" data-cat="box">
+      <div class="cat-group-header">
+        <h2>Box <em>Arrangements</em></h2>
+        <div class="cat-group-line"></div>
+        <span class="cat-count">6 photos</span>
+      </div>
+      <div class="cat-grid">
+        <div class="gallery-card" onclick="openLightbox('Images/box.jpg')">
+          <img src="Images\box.jpg" alt="Box 1" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Flower Box</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/big box.jpg')">
+          <img src="Images\big box.jpg" alt="Box 2" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">TeadyBear Box</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/Celebration Box.jpg')">
+          <img src="Images\Celebration Box.jpg" alt="Box 3" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Happy Birthday Box</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/Congratulations Box.jpg')">
+          <img src="Images\Congratulations Box.jpg" alt="Box 4" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Graduation Box</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/valentines.jpg')">
+          <img src="Images\valentines.jpg" alt="Box 5" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Valentines Box</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOM -->
+    <div class="cat-group" data-cat="custom">
+      <div class="cat-group-header">
+        <h2><em>Custom</em></h2>
+        <div class="cat-group-line"></div>
+        <span class="cat-count">6 photos</span>
+      </div>
+      <div class="cat-grid">
+        <div class="gallery-card" onclick="openLightbox('Images/bloom.jpg')">
+          <img src="Images\bloom.jpg" alt="Custom 1" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Basket</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/custom.jpg')">
+          <img src="Images\custom.jpg" alt="Custom 2" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Paper Basket</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/gift for wd.jpg')">
+          <img src="Images\gift for wd.jpg" alt="Custom 3" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Wedding Gift Box</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/Flower Basket.jpg')">
+          <img src="Images\Flower Basket.jpg" alt="Custom 4" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Flower Basket</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/premium.jpg')">
+          <img src="Images\premium.jpg" alt="Custom 5" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Premium Bouquet</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/kpop.jpg')">
+          <img src="Images\kpop.jpg" alt="Custom 6" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Kpop Bouquet</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GIFT SETS -->
+    <div class="cat-group" data-cat="giftsets">
+      <div class="cat-group-header">
+        <h2>Gift <em>Sets</em></h2>
+        <div class="cat-group-line"></div>
+        <span class="cat-count">6 photos</span>
+      </div>
+      <div class="cat-grid">
+        <div class="gallery-card" onclick="openLightbox('Images/Graduation Bouquet.jpg')">
+          <img src="Images\Graduation Bouquet.jpg" alt="Gift Set 1" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Grad Set</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/money.jpg')">
+          <img src="Images\money.jpg" alt="Gift Set 2" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Money Garland</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/sweet.jpg')">
+          <img src="Images\sweet.jpg" alt="Gift Set 3" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Sweet Bouquet</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/choc.jpg')">
+          <img src="Images\choc.jpg" alt="Gift Set 4" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Chocolate Bouquet</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/snoopy.jpg')">
+          <img src="Images\snoopy.jpg" alt="Gift Set 5" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Snoopy Bouquet</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/Pastel Birthday Wrap.jpg')">
+          <img src="Images\Pastel Birthday Wrap.jpg" alt="Gift Set 6" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Cake</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CROCHET -->
+    <div class="cat-group" data-cat="crochet">
+      <div class="cat-group-header">
+        <h2><em>Crochet</em></h2>
+        <div class="cat-group-line"></div>
+        <span class="cat-count">6 photos</span>
+      </div>
+      <div class="cat-grid">
+        <div class="gallery-card" onclick="openLightbox('Images/cro sun.jpg')">
+          <img src="Images\cro sun.jpg" alt="Crochet 1" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Sunflower Crochet</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/cro tul.jpg')">
+          <img src="Images\cro tul.jpg" alt="Crochet 2" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Tulip Crochet</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/red croc.jpg')">
+          <img src="Images\red croc.jpg" alt="Crochet 3" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Red Flower Crochet</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/Sunflower Grad Wrap.jpg')">
+          <img src="Images\Sunflower Grad Wrap.jpg" alt="Crochet 4" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Grad Crochet</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/cro mixed.jpg')">
+          <img src="Images\cro mixed.jpg" alt="Crochet 5" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Mixed Crochet</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/brown croc.jpg')">
+          <img src="Images\brown croc.jpg" alt="Crochet 6" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Crochet Bouquet</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEDDING -->
+    <div class="cat-group" data-cat="wedding">
+      <div class="cat-group-header">
+        <h2><em>Wedding</em></h2>
+        <div class="cat-group-line"></div>
+        <span class="cat-count">6 photos</span>
+      </div>
+      <div class="cat-grid">
+        <div class="gallery-card" onclick="openLightbox('Images/wedding.jpg')">
+          <img src="Images/wedding.jpg" alt="Wedding 1" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Wedding</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/brid.jpg')">
+          <img src="Images/brid.jpg" alt="Bridal Bouquet" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Bridal Bouquet</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/bri cen.jpg')">
+          <img src="Images/bri cen.jpg" alt="Centerpiece" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Centerpiece</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/arra.jpg')">
+          <img src="Images/arra.jpg" alt="Arrangement" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Arrangement</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/chu.jpg')">
+          <img src="Images/chu.jpg" alt="Church Arch" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Church Arch</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/flo girl.jpg')">
+          <img src="Images/flo girl.jpg" alt="Flower Girl Basket" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Flower Girl Basket</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FUNERAL -->
+    <div class="cat-group" data-cat="funeral">
+      <div class="cat-group-header">
+        <h2><em>Funeral</em></h2>
+        <div class="cat-group-line"></div>
+        <span class="cat-count">6 photos</span>
+      </div>
+      <div class="cat-grid">
+        <div class="gallery-card" onclick="openLightbox('Images/casket.jpg')">
+          <img src="Images\casket.jpg" alt="Funeral 1" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Casket</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/ded.jpg')">
+          <img src="Images\ded.jpg" alt="Funeral 2" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Casket</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/Memorial.jpg')">
+          <img src="Images\Memorial.jpg" alt="Funeral 3" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Wreaths</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/stand.jpg')">
+          <img src="Images\stand.jpg" alt="Funeral 4" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Standing Sprays</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/sym.jpg')">
+          <img src="Images\sym.jpg" alt="Funeral 5" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Floor Bouquet</span></div>
+        </div>
+        <div class="gallery-card" onclick="openLightbox('Images/ros.jpg')">
+          <img src="Images\ros.jpg" alt="Funeral 6" loading="lazy"/>
+          <div class="gallery-card-overlay"><span class="gallery-card-label">Funeral Basket</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NO RESULTS -->
+    <div class="no-results" id="noResults">
+      <p> No results found. Try a different search!</p>
+    </div>
+
+  </div>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <span class="lightbox-close" onclick="closeLightbox()">✕</span>
+    <img id="lightboxImg" src="" alt=""/>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="logo">Mystical Garden</span>
+        <p>Crafting beautiful floral arrangements for every moment, milestone, and memory.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Core Features</h4>
+        <a href="#">Same Day Delivery</a>
+        <a href="#">Custom Bouquets</a>
+        <a href="#">Event Florals</a>
+        <a href="#">Gift Packages</a>
+      </div>
+      <div class="footer-col">
+        <h4>Learn More</h4>
+        <a href="#">Blog</a>
+        <a href="#">Case Studies</a>
+        <a href="#">Customer Stories</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="#">Contact</a>
+        <a href="#">Support</a>
+        <a href="#">Legal</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Mystical Garden All rights reserved.</span>
+      <div class="footer-socials">
+        <a href="https://www.instagram.com/won_jww" target="_blank">📸</a>
+      <a href="https://www.twitter.com/aea29858" target="_blank">🐦</a>
+     <a href="https://mail.google.com/mail/?view=cm&to=aea29858@gmail.com" target="_blank">💼</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ── CATEGORY FILTER ──
+    function filterCat(cat, btn) {
+      document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('searchInput').value = '';
+
+      const groups = document.querySelectorAll('.cat-group');
+      groups.forEach(g => {
+        if (cat === 'all' || g.dataset.cat === cat) {
+          g.style.display = 'block';
+        } else {
+          g.style.display = 'none';
+        }
+      });
+      document.getElementById('noResults').style.display = 'none';
+    }
+
+    // ── SEARCH ──
+    document.getElementById('searchInput').addEventListener('input', function () {
+      const q = this.value.toLowerCase().trim();
+      document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector('.cat-tab').classList.add('active');
+
+      let anyVisible = false;
+      document.querySelectorAll('.cat-group').forEach(group => {
+        const catName = group.dataset.cat.toLowerCase();
+        const cards = group.querySelectorAll('.gallery-card');
+        let groupVisible = false;
+
+        cards.forEach(card => {
+          const alt = card.querySelector('img').alt.toLowerCase();
+          const label = card.querySelector('.gallery-card-label').textContent.toLowerCase();
+          const match = !q || alt.includes(q) || label.includes(q) || catName.includes(q);
+          card.style.display = match ? 'block' : 'none';
+          if (match) groupVisible = true;
+        });
+
+        group.style.display = groupVisible ? 'block' : 'none';
+        if (groupVisible) anyVisible = true;
+      });
+
+      document.getElementById('noResults').style.display = anyVisible ? 'none' : 'block';
+    });
+
+    // ── LIGHTBOX ──
+    function openLightbox(src) {
+      document.getElementById('lightboxImg').src = src;
+      document.getElementById('lightbox').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+    window.addEventListener('DOMContentLoaded', () => {
+  const user = JSON.parse(localStorage.getItem('mg_user'));
+  const signinBtn = document.getElementById('navSignin');
+  if (user && signinBtn) {
+    signinBtn.innerHTML = `Hi, ${user.name.split(' ')[0]}! &nbsp;|&nbsp; <span onclick="logOut()" style="cursor:pointer;color:var(--pink)">Logout</span>`;
+    signinBtn.href = '#';
+  }
+});
+
+function logOut() {
+  localStorage.removeItem("mg_user");
+  localStorage.removeItem("mg_cart"); // CLEAR CART
+  window.location.href = "index.html";
+}
+
+
+  </script>
+</body>
+</html>
